@@ -13,7 +13,7 @@ import time
 
 # Discord Bot #
 intents = discord.Intents.all()
-TOKEN = "MTE4NDIyMzIyMzM3MDQ4MTY3NA.GSRo3t.Bi3fUcCEzJ_Wr3MpZrhuJYq-rrWLyvZcmgPask"
+TOKEN = "MTE4NDIyMzIyMzM3MDQ4MTY3NA.G5Jt_D.i4Y1nc44CAl7mCYhtXo0are1AxfubWHtzl9wps"
 bot = commands.Bot(command_prefix="!", intents=intents)
 @bot.event
 async def on_ready():
@@ -100,7 +100,13 @@ async def balance(interaction : discord.Interaction):
 
 # Blackjack #
 @bot.tree.command(name="blackjack", description="Gambling Gamemode")
-async def blackjack(interaction : discord.Interaction):
+@app_commands.describe(betamount = "How Much Coins You Want To Gamble.")
+@app_commands.choices(betamount = [
+    discord.app_commands.Choice(name="20 Coins", value=20),
+    discord.app_commands.Choice(name="50 Coins", value=50),
+    discord.app_commands.Choice(name="100 Coins", value=100)
+])
+async def blackjack(interaction : discord.Interaction, betamount : int):
     await open_account(interaction.user)
     user = interaction.user
     users = await get_bank_data()
@@ -116,7 +122,6 @@ async def blackjack(interaction : discord.Interaction):
     em = discord.Embed(title=f"**~~ {name}'s Balance **")
     em.set_thumbnail(url=f"{thumbnail}")
 
-    betamount = 0
     dealerscard = "❔"
     playerscard = "❔"
 
@@ -128,9 +133,8 @@ async def blackjack(interaction : discord.Interaction):
     em.set_image(url="https://i.ibb.co/tsDpw62/auto-faqw.png")
     em.set_footer(text="~~ Use The Menu To Go To Specific Pages")
 
-    button1 = Button(label="Bet Amount", style=discord.ButtonStyle.secondary)
-    button2 = Button(label="Start", style=discord.ButtonStyle.green)
-    button3 = Button(label="Cancel", style=discord.ButtonStyle.red)
+    button1 = Button(label="Start", style=discord.ButtonStyle.green)
+    button2 = Button(label="Cancel", style=discord.ButtonStyle.red)
     async def button_callback1(interaction):
         if interaction.user != user:
             return False
@@ -141,19 +145,12 @@ async def blackjack(interaction : discord.Interaction):
             return False
         else:
             await interaction.response.edit_message(view=None)
-    async def button_callback3(interaction):
-        if interaction.user != user:
-            return False
-        else:
-            await interaction.response.edit_message(view=None)
 
     button1.callback = button_callback1
     button2.callback = button_callback2
-    button3.callback = button_callback3
     view = View()
     view.add_item(button1)
     view.add_item(button2)
-    view.add_item(button3)
     await interaction.response.send_message(f"<@"+str(user.id)+">", embed=em, view=view)
 
 # Function - Open Account #
